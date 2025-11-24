@@ -37,7 +37,12 @@ const Settings = ({ settings, onSaveSettings, onResetProgress, onExportProgress,
     return (
         <div>
             <div className="settings-section">
-                <h2>Study Settings</h2>
+                <div className="settings-header">
+                    <h2>Study Settings</h2>
+                    <button className="btn btn-save" onClick={handleSave}>
+                        Save
+                    </button>
+                </div>
 
                 <div className="setting-item">
                     <label htmlFor="new-cards-per-day">
@@ -151,11 +156,8 @@ const Settings = ({ settings, onSaveSettings, onResetProgress, onExportProgress,
                         Auto-pronounce when flipping cards
                     </label>
                 </div>
-
-                <button className="btn btn-primary" onClick={handleSave}>
-                    Save Settings
-                </button>
             </div>
+            <hr className="settings-divider" />
 
             <div className="settings-section">
                 <h2>Help & Support</h2>

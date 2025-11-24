@@ -584,6 +584,20 @@ header h1 {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
+.btn-save {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    font-size: 1em;
+    padding: 10px 20px;
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+}
+
 .btn-again {
     background: #ef4444;
     color: white;
@@ -763,6 +777,26 @@ header h1 {
 /* Settings */
 .settings-section {
     margin-bottom: 40px;
+}
+
+.settings-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e0e0e0 20%, #e0e0e0 80%, transparent);
+    margin: 10px 0 30px 0;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+.settings-header h2 {
+    margin: 0;
+    line-height: 1.2;
 }
 
 .settings-section h2,
@@ -2801,6 +2835,12 @@ header h1 {
         padding: 18px 24px;
         font-size: 1.2em;
         height: 60px;
+    }
+
+    .btn-save {
+        padding: 10px 20px;
+        font-size: 1em;
+        height: auto;
     }
 
     .undo-btn {
