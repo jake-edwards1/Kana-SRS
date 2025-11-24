@@ -24,7 +24,6 @@ const Study = ({
     masteredCount,
     sessionComplete,
     sessionStats,
-    onContinueLearning,
     onReviewRecentCards,
     onExitReviewMode,
     onUndoRating,
@@ -100,16 +99,13 @@ const Study = ({
                         <div>Accuracy: <strong>{accuracy}%</strong></div>
                     </div>
                 )}
-                <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '20px' }}>
-                    <button className="btn btn-primary" onClick={onContinueLearning}>
-                        Continue Learning
-                    </button>
-                    {sessionCardsCount > 0 && (
+                {sessionCardsCount > 0 && (
+                    <div style={{ marginTop: '20px' }}>
                         <button className="btn btn-primary" onClick={onReviewRecentCards} style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
                             Practice Recent Cards ({sessionCardsCount})
                         </button>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         );
     }
@@ -169,7 +165,13 @@ const Study = ({
                         New
                         <span className="info-tooltip-wrapper">
                             <span className="info-icon">ⓘ</span>
-                            <span className="info-tooltip-text">Cards introduced today vs daily goal</span>
+                            <span className="info-tooltip-text info-tooltip-wide">
+                                <strong>New cards introduced today</strong><br/><br/>
+                                <span className="tooltip-color-indicator tooltip-blue"></span> At or under daily goal<br/>
+                                <span className="tooltip-color-indicator tooltip-orange"></span> 1-3 over goal<br/>
+                                <span className="tooltip-color-indicator tooltip-red"></span> 4+ over goal<br/><br/>
+                                Learning too many new cards builds up tomorrow's reviews. Stick to your goal for sustainable progress!
+                            </span>
                         </span>
                     </div>
                     <div className="info-value">

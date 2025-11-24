@@ -10,6 +10,7 @@ import Statistics from './components/Statistics';
 import Settings from './components/Settings';
 import ToastContainer from './components/ToastContainer';
 import DailyWelcome from './components/DailyWelcome';
+import WelcomeWizard from './components/WelcomeWizard';
 
 function App() {
     const [cards, setCards] = useState([]);
@@ -35,7 +36,6 @@ function App() {
         best: 0,
         lastStudyDate: null
     });
-    const [bypassDailyLimit, setBypassDailyLimit] = useState(false);
     const [toasts, setToasts] = useState([]);
     const [lastRating, setLastRating] = useState(null); // For undo functionality
     const [showWelcome, setShowWelcome] = useState(false);
@@ -107,15 +107,20 @@ function App() {
         const today = new Date().toDateString();
         const lastVisitDate = localStorage.getItem('lastVisitDate');
 
+        // Check if user has completed the welcome wizard
+        const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+
         if (data) {
             const restoredCards = data.cards.map(cardData => restoreCard(cardData));
             setCards(restoredCards);
             if (data.settings) setSettings(data.settings);
             if (data.streak) setStreak(data.streak);
 
-            // Check if it's a new day
-            if (lastVisitDate && lastVisitDate !== today) {
-                // Calculate yesterday's stats from the cards
+            // Show welcome wizard if they haven't seen it (for existing users who haven't gone through new wizard)
+            if (!hasSeenWelcome) {
+                setShowWelcome(true);
+            } else if (lastVisitDate && lastVisitDate !== today) {
+                // Check if it's a new day (only if they've seen the welcome)
                 const yesterday = new Date();
                 yesterday.setDate(yesterday.getDate() - 1);
                 const yesterdayStr = yesterday.toDateString();
@@ -142,8 +147,7 @@ function App() {
             }
         } else {
             initializeCards();
-            // Show welcome message for new users
-            const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+            // Show welcome wizard for new users
             if (!hasSeenWelcome) {
                 setShowWelcome(true);
             }
@@ -192,7 +196,7 @@ function App() {
         // Unlock katakana after 40 hiragana cards have been introduced
         if (introducedHiragana >= 40) {
             setSettings(prev => ({ ...prev, katakanaUnlocked: true, enableKatakana: true }));
-            showToast('🎉 Katakana Unlocked! New cards have been added to your deck. Click "Continue Learning" to start!', 'success', 6000);
+            showToast('🎉 Katakana Unlocked! New cards have been added to your deck.', 'success', 5000);
         }
     }, [cards, settings.katakanaUnlocked, showToast]);
 
@@ -213,28 +217,9 @@ function App() {
     }, [cards]);
 
     const getNewCards = useCallback(() => {
-        // Get cards that have never been introduced
-        const neverIntroduced = cards.filter(card => card.totalReviews === 0 && !card.introducedDate);
-
-        // If bypassing daily limit, return all new cards
-        if (bypassDailyLimit) {
-            return neverIntroduced;
-        }
-
-        // Otherwise, enforce daily limit
-        const today = new Date().toDateString();
-
-        // Count how many cards were introduced today
-        const introducedToday = cards.filter(card => {
-            if (!card.introducedDate) return false;
-            return new Date(card.introducedDate).toDateString() === today;
-        }).length;
-
-        // Calculate how many more cards we can introduce today
-        const remainingSlots = Math.max(0, settings.newCardsPerDay - introducedToday);
-
-        return neverIntroduced.slice(0, remainingSlots);
-    }, [cards, settings.newCardsPerDay, bypassDailyLimit]);
+        // Get cards that have never been introduced (no daily limit enforcement)
+        return cards.filter(card => card.totalReviews === 0 && !card.introducedDate);
+    }, [cards]);
 
     const getLearningCards = useCallback(() => {
         return cards.filter(card => card.isLearning());
@@ -264,7 +249,6 @@ function App() {
         if (availableCards.length === 0) {
             setSessionComplete(true);
             setCurrentCard(null);
-            setBypassDailyLimit(false); // Reset bypass mode when session completes
             setReviewMode(false); // Exit review mode
             updateStreak();
             return;
@@ -451,27 +435,6 @@ function App() {
         }
     };
 
-    // Continue learning (add new cards)
-    const handleContinueLearning = () => {
-        setBypassDailyLimit(true);
-        setSessionComplete(false);
-        setReviewMode(false);
-
-        // Force a check for new cards
-        setTimeout(() => {
-            const newCards = getNewCards();
-            const dueCards = getDueCards();
-
-            if (newCards.length === 0 && dueCards.length === 0) {
-                // No cards available even with bypass
-                setSessionComplete(true);
-                showToast('You\'ve completed all available cards for now. Great work!', 'success', 4000);
-            } else {
-                nextCard();
-            }
-        }, 100);
-    };
-
     // Start review mode for recent cards
     const handleReviewRecentCards = () => {
         if (sessionCards.length === 0) {
@@ -537,6 +500,13 @@ function App() {
             });
     };
 
+    // Handle welcome wizard completion
+    const handleWelcomeComplete = (newCardsPerDay) => {
+        setSettings(prev => ({ ...prev, newCardsPerDay }));
+        setShowWelcome(false);
+        localStorage.setItem('hasSeenWelcome', 'true');
+    };
+
     // Initialize first card
     useEffect(() => {
         if (cards.length > 0 && !currentCard && activeTab === 'study') {
@@ -578,22 +548,16 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab, isFlipped, currentCard, historyIndex, cardHistory]);
 
-    // Reset bypass mode when switching tabs
-    useEffect(() => {
-        if (activeTab !== 'study') {
-            setBypassDailyLimit(false);
-        }
-    }, [activeTab]);
-
     const dueCount = getDueCards().length;
     const newCount = getNewCards().length;
     const learningCount = getLearningCards().length;
     const masteredCount = getMasteredCards().length;
 
-    // Calculate cards introduced today
+    // Calculate cards introduced today (excluding manually mastered cards)
     const today = new Date().toDateString();
     const introducedToday = cards.filter(card => {
         if (!card.introducedDate) return false;
+        if (card.isMastered()) return false; // Don't count manually mastered cards
         return new Date(card.introducedDate).toDateString() === today;
     }).length;
 
@@ -735,7 +699,6 @@ function App() {
                     masteredCount={masteredCount}
                     sessionComplete={sessionComplete}
                     sessionStats={sessionStats}
-                    onContinueLearning={handleContinueLearning}
                     onReviewRecentCards={handleReviewRecentCards}
                     onExitReviewMode={handleExitReviewMode}
                     onUndoRating={handleUndoRating}
@@ -774,73 +737,12 @@ function App() {
                 />
             )}
 
-            {/* Welcome Modal for First-Time Users */}
+            {/* Welcome Wizard for First-Time Users */}
             {showWelcome && (
-                <div className="modal-overlay" onClick={() => { setShowWelcome(false); localStorage.setItem('hasSeenWelcome', 'true'); }}>
-                    <div className="modal-content welcome-modal" onClick={(e) => e.stopPropagation()}>
-                        <button className="modal-close" onClick={() => { setShowWelcome(false); localStorage.setItem('hasSeenWelcome', 'true'); }}>×</button>
-                        <div className="welcome-content">
-                            <div className="welcome-icon">👋</div>
-                            <h2>Welcome to Japanese Kana Flashcards!</h2>
-                            <p className="welcome-intro">Master all 142 Japanese characters (hiragana + katakana) using proven spaced repetition techniques. Here's everything you need to know:</p>
-
-                            <div className="welcome-tips">
-                                <div className="welcome-tip">
-                                    <div className="tip-icon">📚</div>
-                                    <div className="tip-content">
-                                        <h3>How Spaced Repetition Works</h3>
-                                        <p>The app tracks when you'll forget each character and shows it to you just before that happens. Cards you struggle with appear more frequently, while mastered cards appear less often (eventually weeks apart). This maximizes retention while minimizing study time.</p>
-                                    </div>
-                                </div>
-
-                                <div className="welcome-tip">
-                                    <div className="tip-icon">🎯</div>
-                                    <div className="tip-content">
-                                        <h3>Your Daily Routine</h3>
-                                        <p><strong>1. Review due cards</strong> - Cards that are ready for review today<br/>
-                                        <strong>2. Learn new cards</strong> - Limited to 10 per day by default to avoid getting overwhelmed<br/>
-                                        <strong>3. Rate honestly</strong> - Again (forgot), Hard (difficult), Good (correct), Easy (very easy)</p>
-                                    </div>
-                                </div>
-
-                                <div className="welcome-tip">
-                                    <div className="tip-icon">⭐</div>
-                                    <div className="tip-content">
-                                        <h3>Rating Guidelines</h3>
-                                        <p><strong>Again:</strong> You couldn't remember - see it again soon<br/>
-                                        <strong>Hard:</strong> You got it but struggled - review sooner<br/>
-                                        <strong>Good:</strong> You remembered correctly - normal interval<br/>
-                                        <strong>Easy:</strong> Too easy - longer interval between reviews</p>
-                                    </div>
-                                </div>
-
-                                <div className="welcome-tip">
-                                    <div className="tip-icon">🔓</div>
-                                    <div className="tip-content">
-                                        <h3>Unlock Katakana</h3>
-                                        <p>Start with hiragana! After you've introduced 40 characters, katakana will automatically unlock. This gives you a solid foundation before tackling the next script.</p>
-                                    </div>
-                                </div>
-
-                                <div className="welcome-tip">
-                                    <div className="tip-icon">🔥</div>
-                                    <div className="tip-content">
-                                        <h3>Build Your Streak</h3>
-                                        <p>Study every day to maintain your streak! Even 5 minutes counts. The app remembers your progress (backed up in your browser), so you can pick up right where you left off.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button
-                                className="btn btn-primary"
-                                onClick={() => { setShowWelcome(false); localStorage.setItem('hasSeenWelcome', 'true'); }}
-                                style={{ marginTop: '30px', fontSize: '1.1em' }}
-                            >
-                                Let's Get Started!
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <WelcomeWizard
+                    onComplete={handleWelcomeComplete}
+                    defaultNewCardsPerDay={settings.newCardsPerDay}
+                />
             )}
         </div>
     );
