@@ -195,8 +195,8 @@ const Settings = ({ settings, onSaveSettings, onResetProgress, onExportProgress,
             </div>
 
             <div className="settings-section danger-zone">
-                <h3>Danger Zone</h3>
-                <button className="btn btn-danger" onClick={handleReset}>
+                {/*<h3>Danger Zone</h3>*/}
+                <button className="btn-danger" onClick={handleReset}>
                     Reset All Progress
                 </button>
                 <p className="warning-text">

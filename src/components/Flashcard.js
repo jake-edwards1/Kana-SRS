@@ -5,6 +5,7 @@ const Flashcard = ({ card, isFlipped, onFlip, onMarkMastered }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [pronunciationGuideOpen, setPronunciationGuideOpen] = useState(false);
     const [strokeOrderOpen, setStrokeOrderOpen] = useState(false);
+    const [hintExpanded, setHintExpanded] = useState(false);
     const menuRef = useRef(null);
 
     // Close menu when clicking outside
@@ -24,9 +25,10 @@ const Flashcard = ({ card, isFlipped, onFlip, onMarkMastered }) => {
         };
     }, [menuOpen]);
 
-    // Close menu when card is flipped
+    // Close menu when card is flipped and reset hint
     useEffect(() => {
         setMenuOpen(false);
+        setHintExpanded(false);
     }, [isFlipped, card]);
 
     if (!card) return null;
@@ -66,14 +68,9 @@ const Flashcard = ({ card, isFlipped, onFlip, onMarkMastered }) => {
             <div className={`flashcard ${isFlipped ? 'flipped' : ''}`}>
                 {/* Front of card */}
                 <div className="flashcard-front" onClick={onFlip}>
-                    <div className="character">{card.char}</div>
-                </div>
-
-                {/* Back of card */}
-                <div className="flashcard-back" onClick={onFlip}>
                     <div className="card-banner">
                         <div className="card-banner-left">
-                            <div className="card-menu-wrapper" ref={menuRef}>
+                            <div className="card-menu-wrapper" ref={!isFlipped ? menuRef : null}>
                                 <button
                                     className="card-menu-btn"
                                     onClick={toggleMenu}
@@ -81,7 +78,36 @@ const Flashcard = ({ card, isFlipped, onFlip, onMarkMastered }) => {
                                 >
                                     ⋮
                                 </button>
-                                {menuOpen && (
+                                {menuOpen && !isFlipped && (
+                                    <div className="card-menu-dropdown">
+                                        <button
+                                            className="card-menu-item"
+                                            onClick={handleMarkMastered}
+                                            disabled={card.isMastered()}
+                                        >
+                                            ✓ Mark as Mastered
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="character">{card.char}</div>
+                </div>
+
+                {/* Back of card */}
+                <div className="flashcard-back" onClick={onFlip}>
+                    <div className="card-banner">
+                        <div className="card-banner-left">
+                            <div className="card-menu-wrapper" ref={isFlipped ? menuRef : null}>
+                                <button
+                                    className="card-menu-btn"
+                                    onClick={toggleMenu}
+                                    aria-label="Card options"
+                                >
+                                    ⋮
+                                </button>
+                                {menuOpen && isFlipped && (
                                     <div className="card-menu-dropdown">
                                         <button
                                             className="card-menu-item"
@@ -126,19 +152,33 @@ const Flashcard = ({ card, isFlipped, onFlip, onMarkMastered }) => {
                     <div className="romaji">{card.romaji}</div>
 
                     <div className="mnemonic-section">
-                        {card.image && (
-                            <img
-                                src={card.image}
-                                alt={`Mnemonic for ${card.char}`}
-                                className="mnemonic-image"
-                                onError={(e) => {
-                                    e.target.style.display = 'none';
+                        {!hintExpanded ? (
+                            <button
+                                className="show-hint-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setHintExpanded(true);
                                 }}
-                            />
+                            >
+                                💡 Show Hint
+                            </button>
+                        ) : (
+                            <>
+                                {card.image && (
+                                    <img
+                                        src={card.image}
+                                        alt={`Mnemonic for ${card.char}`}
+                                        className="mnemonic-image"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                        }}
+                                    />
+                                )}
+                                <div className="mnemonic-description">
+                                    {card.mnemonic}
+                                </div>
+                            </>
                         )}
-                        <div className="mnemonic-description">
-                            {card.mnemonic}
-                        </div>
                     </div>
                 </div>
             </div>

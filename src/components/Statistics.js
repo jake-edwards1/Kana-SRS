@@ -75,12 +75,12 @@ const Statistics = ({ cards, streak }) => {
             .slice(0, 10);
     }, [cards]);
 
-    // Progress Over Time (cards mastered per week for last 12 weeks)
+    // Progress Over Time (cards mastered per week for last 6 weeks)
     const progressOverTime = useMemo(() => {
         const weeks = [];
         const today = new Date();
 
-        for (let i = 11; i >= 0; i--) {
+        for (let i = 5; i >= 0; i--) {
             const weekStart = new Date(today);
             weekStart.setDate(weekStart.getDate() - (i * 7) - today.getDay());
             weekStart.setHours(0, 0, 0, 0);
@@ -254,7 +254,7 @@ const Statistics = ({ cards, streak }) => {
 
             {/* Progress Over Time */}
             <div className="stats-section">
-                <h3>📉 Cards Mastered Over Time (12 Weeks)</h3>
+                <h3>📉 Cards Mastered (6 Weeks)</h3>
                 <p className="stats-description">Visualize your learning journey.</p>
                 <div className="progress-chart">
                     {progressOverTime.map((week, index) => {

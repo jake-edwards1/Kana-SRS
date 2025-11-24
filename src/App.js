@@ -380,6 +380,9 @@ function App() {
 
         // Update cards state to trigger re-render
         setCards(prevCards => [...prevCards]);
+
+        // Move to next card
+        nextCard();
     };
 
     // Update streak
@@ -577,35 +580,42 @@ function App() {
                         </button>
                     </div>
                 </div>
-
-                {/* Mobile Dropdown Menu */}
-                <nav className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
-                    <button
-                        className={`mobile-menu-item ${activeTab === 'study' ? 'active' : ''}`}
-                        onClick={() => handleTabClick('study')}
-                    >
-                        <span className="menu-icon">📚</span>
-                        Study
-                        {(dueCount + newCount) > 0 && (
-                            <span className="menu-badge">{dueCount + newCount}</span>
-                        )}
-                    </button>
-                    <button
-                        className={`mobile-menu-item ${activeTab === 'stats' ? 'active' : ''}`}
-                        onClick={() => handleTabClick('stats')}
-                    >
-                        <span className="menu-icon">📊</span>
-                        Statistics
-                    </button>
-                    <button
-                        className={`mobile-menu-item ${activeTab === 'settings' ? 'active' : ''}`}
-                        onClick={() => handleTabClick('settings')}
-                    >
-                        <span className="menu-icon">⚙️</span>
-                        Settings
-                    </button>
-                </nav>
             </header>
+
+            {/* Mobile Slide-out Menu */}
+            <div
+                className={`mobile-menu-overlay ${mobileMenuOpen ? 'open' : ''}`}
+                onClick={() => setMobileMenuOpen(false)}
+            />
+            <nav className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+                <div className="mobile-menu-header">
+                    <div className="mobile-menu-title">Menu</div>
+                </div>
+                <button
+                    className={`mobile-menu-item ${activeTab === 'study' ? 'active' : ''}`}
+                    onClick={() => handleTabClick('study')}
+                >
+                    <span className="menu-icon">📚</span>
+                    Study
+                    {(dueCount + newCount) > 0 && (
+                        <span className="menu-badge">{dueCount + newCount}</span>
+                    )}
+                </button>
+                <button
+                    className={`mobile-menu-item ${activeTab === 'stats' ? 'active' : ''}`}
+                    onClick={() => handleTabClick('stats')}
+                >
+                    <span className="menu-icon">📊</span>
+                    Statistics
+                </button>
+                <button
+                    className={`mobile-menu-item ${activeTab === 'settings' ? 'active' : ''}`}
+                    onClick={() => handleTabClick('settings')}
+                >
+                    <span className="menu-icon">⚙️</span>
+                    Settings
+                </button>
+            </nav>
 
             {/* Desktop Navigation */}
             <nav className="tabs desktop-tabs">
