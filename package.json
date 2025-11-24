@@ -2,6 +2,7 @@
   "name": "hiragana-flashcards",
   "version": "1.0.0",
   "description": "Japanese Hiragana Flashcard App with SRS Algorithm",
+  "homepage": "https://jake-edwards1.github.io/Kana-SRS",
   "private": true,
   "dependencies": {
     "cross-env": "^10.1.0",
@@ -9,11 +10,16 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1"
   },
+  "devDependencies": {
+    "gh-pages": "^6.1.1"
+  },
   "scripts": {
     "start": "cross-env NODE_OPTIONS=--no-experimental-webstorage react-scripts start",
     "build": "cross-env NODE_OPTIONS=--no-experimental-webstorage react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
