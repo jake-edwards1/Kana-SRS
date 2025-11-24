@@ -5,7 +5,8 @@
       "Bash(move styles.css vanilla-version-backup )",
       "Bash(move app.js vanilla-version-backup)",
       "Bash(node --version:*)",
-      "Bash(powershell.exe -Command \"Get-Process -Name node | Where-Object { $_.Id -ne $PID } | ForEach-Object { Stop-Process -Id $_.Id -Force }\")"
+      "Bash(powershell.exe -Command \"Get-Process -Name node | Where-Object { $_.Id -ne $PID } | ForEach-Object { Stop-Process -Id $_.Id -Force }\")",
+      "WebFetch(domain:jake-edwards1.github.io)"
     ],
     "deny": [],
     "ask": []
