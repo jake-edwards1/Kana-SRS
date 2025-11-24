@@ -381,8 +381,10 @@ function App() {
         // Update cards state to trigger re-render
         setCards(prevCards => [...prevCards]);
 
-        // Move to next card
-        nextCard();
+        // Only move to next card if on study tab
+        if (activeTab === 'study') {
+            nextCard();
+        }
     };
 
     // Update streak
