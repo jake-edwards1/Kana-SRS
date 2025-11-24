@@ -40,6 +40,7 @@ function App() {
     const [showWelcome, setShowWelcome] = useState(false);
     const [sessionCards, setSessionCards] = useState([]); // Cards reviewed in this session
     const [reviewMode, setReviewMode] = useState(false); // Practice mode for recent cards
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile hamburger menu
 
     // Toast notification system
     const showToast = useCallback((message, type = 'info', duration = 3000) => {
@@ -546,9 +547,15 @@ function App() {
     const learningCount = getLearningCards().length;
     const masteredCount = getMasteredCards().length;
 
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+        setMobileMenuOpen(false);
+    };
+
     return (
         <div className="container">
-            <header>
+            {/* Desktop Header */}
+            <header className="desktop-header">
                 <h1>かな Flashcards</h1>
                 <div className="streak-display">
                     <span className="streak-icon">🔥</span>
@@ -556,7 +563,61 @@ function App() {
                 </div>
             </header>
 
-            <nav className="tabs">
+            {/* Mobile Header */}
+            <header className="mobile-header">
+                <div className="mobile-header-content">
+                    <div className="mobile-logo">
+                        <span className="logo-kana">Kana</span>
+                        <span className="logo-srs">SRS</span>
+                    </div>
+                    <div className="mobile-header-right">
+                        <div className="mobile-streak">
+                            <span className="streak-icon">🔥</span>
+                            <span>{streak.current}</span>
+                        </div>
+                        <button
+                            className={`hamburger-btn ${mobileMenuOpen ? 'open' : ''}`}
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            aria-label="Toggle menu"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile Dropdown Menu */}
+                <nav className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`}>
+                    <button
+                        className={`mobile-menu-item ${activeTab === 'study' ? 'active' : ''}`}
+                        onClick={() => handleTabClick('study')}
+                    >
+                        <span className="menu-icon">📚</span>
+                        Study
+                        {(dueCount + newCount) > 0 && (
+                            <span className="menu-badge">{dueCount + newCount}</span>
+                        )}
+                    </button>
+                    <button
+                        className={`mobile-menu-item ${activeTab === 'stats' ? 'active' : ''}`}
+                        onClick={() => handleTabClick('stats')}
+                    >
+                        <span className="menu-icon">📊</span>
+                        Statistics
+                    </button>
+                    <button
+                        className={`mobile-menu-item ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => handleTabClick('settings')}
+                    >
+                        <span className="menu-icon">⚙️</span>
+                        Settings
+                    </button>
+                </nav>
+            </header>
+
+            {/* Desktop Navigation */}
+            <nav className="tabs desktop-tabs">
                 <button
                     className={`tab-btn ${activeTab === 'study' ? 'active' : ''}`}
                     onClick={() => setActiveTab('study')}
