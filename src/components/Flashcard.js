@@ -26,9 +26,11 @@ const Flashcard = ({ card, isFlipped, onFlip, onMarkMastered }) => {
     }, [menuOpen]);
 
     // Close menu when card is flipped and reset hint
+    // For new cards (no reviews yet), default to showing the hint
     useEffect(() => {
         setMenuOpen(false);
-        setHintExpanded(false);
+        const isNewCard = card && card.totalReviews === 0;
+        setHintExpanded(isNewCard);
     }, [isFlipped, card]);
 
     if (!card) return null;

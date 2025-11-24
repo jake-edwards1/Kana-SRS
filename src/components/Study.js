@@ -14,7 +14,12 @@ const Study = ({
     canGoPrevious,
     canGoNext,
     dueCount,
+    reviewsCompletedToday,
+    reviewsDueTotal,
     newCount,
+    introducedToday,
+    newCardsGoal,
+    allIntroduced,
     learningCount,
     masteredCount,
     sessionComplete,
@@ -27,6 +32,22 @@ const Study = ({
     reviewMode,
     sessionCardsCount
 }) => {
+    // Determine color class for reviews counter (green when all done)
+    const getReviewsColorClass = () => {
+        if (reviewsDueTotal > 0 && reviewsCompletedToday === reviewsDueTotal) {
+            return 'info-card-complete';
+        }
+        return '';
+    };
+
+    // Determine color class for new cards counter based on how far over the goal
+    const getNewCardsColorClass = () => {
+        if (allIntroduced) return 'info-card-complete';
+        const overBy = introducedToday - newCardsGoal;
+        if (overBy <= 0) return '';
+        if (overBy <= 3) return 'info-card-warning';
+        return 'info-card-danger';
+    };
     const getIntervalPreview = (rating) => {
         if (!currentCard) return '';
         const interval = SRSCard.previewInterval(currentCard, rating);
@@ -127,25 +148,37 @@ const Study = ({
         <div>
             {reviewModeBanner}
             <div className="study-info">
-                <div className="info-card info-card-reviews">
+                <div className={`info-card info-card-reviews ${getReviewsColorClass()}`}>
                     <div className="info-label">
-                        Reviews
+                        Reviews Due
                         <span className="info-tooltip-wrapper">
                             <span className="info-icon">ⓘ</span>
-                            <span className="info-tooltip-text">Cards ready to review today</span>
+                            <span className="info-tooltip-text">Reviews completed today / total due</span>
                         </span>
                     </div>
-                    <div className="info-value">{dueCount}</div>
+                    <div className="info-value">
+                        {reviewsDueTotal === 0 ? (
+                            <span>—</span>
+                        ) : (
+                            <span>{reviewsCompletedToday}/{reviewsDueTotal}</span>
+                        )}
+                    </div>
                 </div>
-                <div className="info-card info-card-new">
+                <div className={`info-card info-card-new ${getNewCardsColorClass()}`}>
                     <div className="info-label">
                         New
                         <span className="info-tooltip-wrapper">
                             <span className="info-icon">ⓘ</span>
-                            <span className="info-tooltip-text">Cards you haven't seen yet (limited per day)</span>
+                            <span className="info-tooltip-text">Cards introduced today vs daily goal</span>
                         </span>
                     </div>
-                    <div className="info-value">{newCount}</div>
+                    <div className="info-value">
+                        {allIntroduced ? (
+                            <span>✓ All Introduced</span>
+                        ) : (
+                            <span>{introducedToday}/{newCardsGoal}</span>
+                        )}
+                    </div>
                 </div>
                 <div className="info-card info-card-learning">
                     <div className="info-label">

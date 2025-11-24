@@ -106,8 +106,24 @@ header h1 {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+.info-card-reviews.info-card-complete {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
 .info-card-new {
     background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.info-card-new.info-card-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.info-card-new.info-card-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.info-card-new.info-card-complete {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 .info-card-learning {
@@ -1663,6 +1679,173 @@ header h1 {
 .tip-content strong {
     color: #333;
     font-weight: 600;
+}
+
+/* Daily Welcome Modal */
+.daily-welcome-modal {
+    max-width: 450px;
+    text-align: center;
+}
+
+.daily-welcome-content {
+    padding: 10px 0;
+}
+
+.daily-greeting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.daily-greeting h2 {
+    color: #333;
+    font-size: 1.8em;
+    margin: 0;
+}
+
+.greeting-icon {
+    font-size: 2.5em;
+}
+
+.motivational-message {
+    color: #666;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+}
+
+.daily-streak-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+    padding: 20px 30px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    color: white;
+    position: relative;
+}
+
+.streak-flame {
+    font-size: 2.5em;
+}
+
+.streak-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.streak-number {
+    font-size: 2.5em;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.streak-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.streak-best {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 0.75em;
+    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 10px;
+}
+
+.yesterday-stats {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.yesterday-stats h3 {
+    color: #667eea;
+    font-size: 0.95em;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.yesterday-stats-grid {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.yesterday-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.yesterday-stat .stat-value {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #333;
+}
+
+.yesterday-stat .stat-label {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.today-goals {
+    background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #667eea30;
+    margin-bottom: 25px;
+}
+
+.today-goals h3 {
+    color: #667eea;
+    font-size: 0.95em;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.goals-grid {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.goal-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.goal-icon {
+    font-size: 1.5em;
+}
+
+.goal-value {
+    font-size: 2em;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.goal-label {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.daily-start-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.1em;
 }
 
 /* Keyboard Shortcuts Overlay */

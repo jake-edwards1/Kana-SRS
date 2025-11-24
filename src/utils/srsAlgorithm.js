@@ -62,9 +62,11 @@ export class SRSCard {
             this.interval = 1;
         }
 
-        // Set next due date
+        // Set next due date (midnight-based: cards become due at start of day)
         const nextDate = new Date();
         nextDate.setDate(nextDate.getDate() + this.interval);
+        // Reset to midnight (start of day) so cards become due at midnight
+        nextDate.setHours(0, 0, 0, 0);
         this.dueDate = nextDate.toISOString();
 
         return this.interval;

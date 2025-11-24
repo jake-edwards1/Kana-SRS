@@ -9,6 +9,7 @@ import Study from './components/Study';
 import Statistics from './components/Statistics';
 import Settings from './components/Settings';
 import ToastContainer from './components/ToastContainer';
+import DailyWelcome from './components/DailyWelcome';
 
 function App() {
     const [cards, setCards] = useState([]);
@@ -41,6 +42,8 @@ function App() {
     const [sessionCards, setSessionCards] = useState([]); // Cards reviewed in this session
     const [reviewMode, setReviewMode] = useState(false); // Practice mode for recent cards
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile hamburger menu
+    const [showDailyWelcome, setShowDailyWelcome] = useState(false); // Daily welcome modal
+    const [yesterdayStats, setYesterdayStats] = useState(null); // Yesterday's stats for daily modal
 
     // Toast notification system
     const showToast = useCallback((message, type = 'info', duration = 3000) => {
@@ -101,10 +104,42 @@ function App() {
     // Load data on mount
     useEffect(() => {
         const data = loadData();
+        const today = new Date().toDateString();
+        const lastVisitDate = localStorage.getItem('lastVisitDate');
+
         if (data) {
-            setCards(data.cards.map(cardData => restoreCard(cardData)));
+            const restoredCards = data.cards.map(cardData => restoreCard(cardData));
+            setCards(restoredCards);
             if (data.settings) setSettings(data.settings);
             if (data.streak) setStreak(data.streak);
+
+            // Check if it's a new day
+            if (lastVisitDate && lastVisitDate !== today) {
+                // Calculate yesterday's stats from the cards
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = yesterday.toDateString();
+
+                const reviewedYesterday = restoredCards.filter(card => {
+                    if (!card.lastReview) return false;
+                    return new Date(card.lastReview).toDateString() === yesterdayStr;
+                }).length;
+
+                const introducedYesterday = restoredCards.filter(card => {
+                    if (!card.introducedDate) return false;
+                    return new Date(card.introducedDate).toDateString() === yesterdayStr;
+                }).length;
+
+                if (reviewedYesterday > 0 || introducedYesterday > 0) {
+                    setYesterdayStats({
+                        reviewed: reviewedYesterday,
+                        introduced: introducedYesterday
+                    });
+                }
+
+                // Show daily welcome modal for returning users on a new day
+                setShowDailyWelcome(true);
+            }
         } else {
             initializeCards();
             // Show welcome message for new users
@@ -113,6 +148,9 @@ function App() {
                 setShowWelcome(true);
             }
         }
+
+        // Update last visit date
+        localStorage.setItem('lastVisitDate', today);
 
         // Load voices for text-to-speech
         loadVoices();
@@ -160,7 +198,16 @@ function App() {
 
     // Get due and new cards
     const getDueCards = useCallback(() => {
-        return cards.filter(card => card.isDue()).sort((a, b) =>
+        const today = new Date().toDateString();
+        // Only include cards that:
+        // 1. Have been introduced
+        // 2. Were introduced BEFORE today (not new cards introduced today)
+        // 3. Are due for review
+        return cards.filter(card => {
+            if (!card.introducedDate) return false;
+            const introducedBeforeToday = new Date(card.introducedDate).toDateString() !== today;
+            return introducedBeforeToday && card.isDue();
+        }).sort((a, b) =>
             new Date(a.dueDate) - new Date(b.dueDate)
         );
     }, [cards]);
@@ -543,6 +590,30 @@ function App() {
     const learningCount = getLearningCards().length;
     const masteredCount = getMasteredCards().length;
 
+    // Calculate cards introduced today
+    const today = new Date().toDateString();
+    const introducedToday = cards.filter(card => {
+        if (!card.introducedDate) return false;
+        return new Date(card.introducedDate).toDateString() === today;
+    }).length;
+
+    // Calculate reviews completed today (cards reviewed today that were introduced before today)
+    // Must have totalReviews > 1 to count (first review is the introduction, not a "review")
+    const reviewsCompletedToday = cards.filter(card => {
+        if (!card.lastReview || !card.introducedDate) return false;
+        if (card.totalReviews < 1) return false; // Need at least one actual review
+        const reviewedToday = new Date(card.lastReview).toDateString() === today;
+        const introducedBeforeToday = new Date(card.introducedDate).toDateString() !== today;
+        return reviewedToday && introducedBeforeToday;
+    }).length;
+
+    // Total reviews that were due today = completed + still remaining
+    // Only show if there are any reviews (avoid showing 0/0)
+    const reviewsDueTotal = reviewsCompletedToday + dueCount;
+
+    // Check if all cards have been introduced
+    const allIntroduced = cards.every(card => card.introducedDate !== null);
+
     const handleTabClick = (tab) => {
         setActiveTab(tab);
         setMobileMenuOpen(false);
@@ -654,7 +725,12 @@ function App() {
                     canGoPrevious={historyIndex > 0 && !reviewMode}
                     canGoNext={historyIndex < cardHistory.length - 1 && !reviewMode}
                     dueCount={dueCount}
+                    reviewsCompletedToday={reviewsCompletedToday}
+                    reviewsDueTotal={reviewsDueTotal}
                     newCount={newCount}
+                    introducedToday={introducedToday}
+                    newCardsGoal={settings.newCardsPerDay}
+                    allIntroduced={allIntroduced}
                     learningCount={learningCount}
                     masteredCount={masteredCount}
                     sessionComplete={sessionComplete}
@@ -685,6 +761,18 @@ function App() {
             </div>
 
             <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+            {/* Daily Welcome Modal for returning users on a new day */}
+            {showDailyWelcome && (
+                <DailyWelcome
+                    streak={streak}
+                    reviewsDueTotal={reviewsDueTotal}
+                    newCardsAvailable={cards.filter(card => card.totalReviews === 0 && !card.introducedDate).length}
+                    newCardsGoal={settings.newCardsPerDay}
+                    yesterdayStats={yesterdayStats}
+                    onClose={() => setShowDailyWelcome(false)}
+                />
+            )}
 
             {/* Welcome Modal for First-Time Users */}
             {showWelcome && (
