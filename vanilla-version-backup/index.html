@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiragana Flashcards - SRS Learning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ひらがな Flashcards</h1>
+            <div class="streak-display">
+                <span class="streak-icon">🔥</span>
+                <span id="streak-count">0</span> day streak
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="study">Study</button>
+            <button class="tab-btn" data-tab="stats">Statistics</button>
+            <button class="tab-btn" data-tab="settings">Settings</button>
+        </nav>
+
+        <!-- Study Tab -->
+        <div class="tab-content active" id="study-tab">
+            <div class="study-info">
+                <div class="info-card">
+                    <div class="info-label">Due Today</div>
+                    <div class="info-value" id="due-count">0</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">New Cards</div>
+                    <div class="info-value" id="new-count">0</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Mastered</div>
+                    <div class="info-value" id="mastered-count">0</div>
+                </div>
+            </div>
+
+            <div class="flashcard-container" id="flashcard-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="flashcard-front" id="flashcard-front">
+                        <div class="character">あ</div>
+                    </div>
+                    <div class="flashcard-back hidden" id="flashcard-back">
+                        <div class="romaji">a</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls" id="controls">
+                <button class="btn btn-primary" id="show-answer-btn">Show Answer</button>
+            </div>
+
+            <div class="rating-controls hidden" id="rating-controls">
+                <button class="btn btn-again" data-rating="1">
+                    Again<br><span class="interval-text" id="interval-1"></span>
+                </button>
+                <button class="btn btn-hard" data-rating="2">
+                    Hard<br><span class="interval-text" id="interval-2"></span>
+                </button>
+                <button class="btn btn-good" data-rating="3">
+                    Good<br><span class="interval-text" id="interval-3"></span>
+                </button>
+                <button class="btn btn-easy" data-rating="4">
+                    Easy<br><span class="interval-text" id="interval-4"></span>
+                </button>
+            </div>
+
+            <div class="session-complete hidden" id="session-complete">
+                <h2>🎉 Session Complete!</h2>
+                <p>Great work! You've reviewed all due cards for today.</p>
+                <div class="session-stats">
+                    <div>Cards reviewed: <strong id="session-reviewed">0</strong></div>
+                    <div>Accuracy: <strong id="session-accuracy">0%</strong></div>
+                </div>
+                <button class="btn btn-primary" id="continue-learning-btn">Continue Learning</button>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div class="tab-content" id="stats-tab">
+            <div class="stats-overview">
+                <h2>Your Progress</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-cards">0</div>
+                        <div class="stat-label">Total Cards</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-reviews">0</div>
+                        <div class="stat-label">Total Reviews</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="best-streak">0</div>
+                        <div class="stat-label">Best Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="accuracy-rate">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="character-breakdown">
+                <h3>Character Breakdown</h3>
+                <div class="breakdown-tabs">
+                    <button class="breakdown-tab active" data-type="all">All</button>
+                    <button class="breakdown-tab" data-type="basic">Basic</button>
+                    <button class="breakdown-tab" data-type="dakuten">Dakuten</button>
+                    <button class="breakdown-tab" data-type="handakuten">Han-Dakuten</button>
+                </div>
+                <div class="character-grid" id="character-grid"></div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-section">
+                <h2>Study Settings</h2>
+
+                <div class="setting-item">
+                    <label for="new-cards-per-day">New cards per day:</label>
+                    <input type="number" id="new-cards-per-day" min="1" max="50" value="10">
+                </div>
+
+                <div class="setting-item">
+                    <label for="review-limit">Daily review limit:</label>
+                    <input type="number" id="review-limit" min="10" max="200" value="100">
+                </div>
+
+                <h3>Character Sets</h3>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="enable-basic" checked disabled>
+                        Basic Hiragana (あ-ん)
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="enable-dakuten" checked>
+                        Dakuten (が, ざ, etc.)
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="enable-handakuten" checked>
+                        Han-Dakuten (ぱ, ぴ, etc.)
+                    </label>
+                </div>
+
+                <button class="btn btn-primary" id="save-settings-btn">Save Settings</button>
+            </div>
+
+            <div class="settings-section danger-zone">
+                <h3>Danger Zone</h3>
+                <button class="btn btn-danger" id="reset-progress-btn">Reset All Progress</button>
+                <p class="warning-text">This will delete all your learning data and cannot be undone.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
