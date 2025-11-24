@@ -207,11 +207,6 @@ const Study = ({
                     <button className="btn btn-primary" onClick={onShowAnswer}>
                         Show Answer
                     </button>
-                    {lastRating && (
-                        <button className="undo-btn" onClick={onUndoRating}>
-                            ↶ Undo Last Rating
-                        </button>
-                    )}
                 </div>
             ) : (
                 <div className="rating-controls">

@@ -331,15 +331,6 @@ function App() {
             setCards(prevCards => [...prevCards]);
         }
 
-        // Show visual feedback
-        if (rating >= 3) {
-            showToast('Correct! Keep it up!', 'success', 2000);
-        } else if (rating === 2) {
-            showToast('Hard one, but you got it!', 'info', 2000);
-        } else {
-            showToast('Don\'t worry, you\'ll get it next time!', 'warning', 2000);
-        }
-
         nextCard();
     };
 

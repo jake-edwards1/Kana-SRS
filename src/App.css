@@ -62,7 +62,7 @@ header h1 {
     border: none;
     font-size: 1em;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background 0.2s, color 0.2s;
     color: #666;
     font-weight: 500;
 }
@@ -651,7 +651,7 @@ header h1 {
     border-radius: 10px;
     padding: 15px 10px;
     text-align: center;
-    transition: all 0.3s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .character-item:hover {
@@ -1042,7 +1042,7 @@ header h1 {
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .difficult-card:hover {
@@ -1871,7 +1871,8 @@ header h1 {
         height: 100dvh;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: hidden;
         padding-bottom: env(safe-area-inset-bottom);
     }
 
@@ -1893,19 +1894,8 @@ header h1 {
         padding: 20px 15px;
         flex: 1;
         overflow-y: auto;
-    }
-
-    /* Only apply height constraints to study tab (first tab-content element) */
-    nav + .tab-content.active {
-        display: flex;
-        flex-direction: column;
-        overflow-y: hidden;
-    }
-
-    nav + .tab-content.active > div {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
     }
 
     /* Show only Reviews and New cards on mobile */
