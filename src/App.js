@@ -202,18 +202,48 @@ function App() {
 
     // Get due and new cards
     const getDueCards = useCallback(() => {
-        const today = new Date().toDateString();
+        const today = new Date();
+        const todayString = today.toDateString();
+
         // Only include cards that:
         // 1. Have been introduced
         // 2. Were introduced BEFORE today (not new cards introduced today)
         // 3. Are due for review
-        return cards.filter(card => {
+        const dueCards = cards.filter(card => {
             if (!card.introducedDate) return false;
-            const introducedBeforeToday = new Date(card.introducedDate).toDateString() !== today;
+            const introducedBeforeToday = new Date(card.introducedDate).toDateString() !== todayString;
             return introducedBeforeToday && card.isDue();
-        }).sort((a, b) =>
-            new Date(a.dueDate) - new Date(b.dueDate)
-        );
+        });
+
+        // Group cards by priority based on how overdue they are
+        const critical = [];   // 3+ days overdue or failed cards (repetitions reset to 0)
+        const high = [];       // 1-2 days overdue
+        const normal = [];     // Due today (0 days overdue)
+
+        dueCards.forEach(card => {
+            const daysOverdue = Math.floor((today - new Date(card.dueDate)) / (1000 * 60 * 60 * 24));
+
+            if (daysOverdue >= 3 || card.repetitions === 0) {
+                critical.push(card);
+            } else if (daysOverdue >= 1) {
+                high.push(card);
+            } else {
+                normal.push(card);
+            }
+        });
+
+        // Shuffle function to randomize within each priority group
+        const shuffle = (array) => {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        };
+
+        // Return cards in priority order with randomization within each group
+        return [...shuffle(critical), ...shuffle(high), ...shuffle(normal)];
     }, [cards]);
 
     const getNewCards = useCallback(() => {
@@ -634,8 +664,8 @@ function App() {
                 >
                     <span className="menu-icon">📚</span>
                     Study
-                    {(dueCount + newCount) > 0 && (
-                        <span className="menu-badge">{dueCount + newCount}</span>
+                    {dueCount > 0 && (
+                        <span className="menu-badge">{dueCount}</span>
                     )}
                 </button>
                 <button
