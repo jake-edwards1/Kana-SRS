@@ -1334,6 +1334,45 @@ header h1 {
     overflow-y: auto;
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    scroll-behavior: smooth;
+}
+
+/* Internal Scrollbar for Modals - Webkit browsers (Chrome, Safari, Edge) */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Remove scrollbar arrows/buttons - comprehensive approach */
+.modal-content::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+.modal-content::-webkit-scrollbar-button:start:decrement,
+.modal-content::-webkit-scrollbar-button:end:increment {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* Internal Scrollbar for Modals - Firefox */
+.modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 .modal-close {

@@ -371,6 +371,11 @@ function App() {
             };
             setSessionStats(newStats);
 
+            // Update streak on first review of the day
+            if (sessionStats.reviewed === 0) {
+                updateStreakOnFirstReview();
+            }
+
             // Save undo state
             setLastRating({
                 card: currentCard,
@@ -448,7 +453,25 @@ function App() {
         }
     };
 
-    // Update streak
+    // Update streak on first review of the day
+    const updateStreakOnFirstReview = () => {
+        const today = new Date().toDateString();
+        const lastStudy = streak.lastStudyDate ? new Date(streak.lastStudyDate).toDateString() : null;
+
+        // Only update if we haven't studied today yet
+        if (lastStudy !== today) {
+            setStreak(prev => {
+                const newCurrent = prev.current + 1;
+                return {
+                    current: newCurrent,
+                    best: Math.max(newCurrent, prev.best),
+                    lastStudyDate: new Date().toISOString()
+                };
+            });
+        }
+    };
+
+    // Update streak (kept for backward compatibility, but now just ensures lastStudyDate is set)
     const updateStreak = () => {
         const today = new Date().toDateString();
         const lastStudy = streak.lastStudyDate ? new Date(streak.lastStudyDate).toDateString() : null;
